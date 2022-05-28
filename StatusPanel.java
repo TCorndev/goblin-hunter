@@ -4,7 +4,6 @@ import java.awt.*;
 
 public class StatusPanel extends JPanel 
 {
-    
     HashMap<String, Integer> stats = new HashMap<>();
     StatusPanel()
     {
@@ -30,9 +29,11 @@ public class StatusPanel extends JPanel
         g.drawString("HP Regen: " + stats.get("HREGEN"), 500, 60);
         g.drawString("MP Regen: " + stats.get("MREGEN"), 500, 75);
         g.drawString("Speed: " + stats.get("Speed"), 500, 90);
+
+        g.drawString("Gold:" + stats.get("Gold"), 800, 15);
     }
-    public void setStats(HashMap<String, Integer> stats)
+    public void setPlayer(Player player)
     {
-        this.stats = stats;
+        this.stats = player.getStats();
     }
 }

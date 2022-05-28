@@ -13,9 +13,15 @@ public class MapPanel extends JPanel implements KeyListener
     final int WIDTH = 1000;
     final int HEIGHT = 900;
     final int SIZE = 25;
-    int[] playerPos = new int[] {20, 18};
-    int encountercheck = 20;
+
+    int[] playerPos = new int[] {20, 18}; //Initial Player Starting Position
+
+    int encounterRate = 20;
+    int encounterCheck = encounterRate;
+
     int animation;
+
+    int level = 0;
     MapPanel()
     {        
         this.setBounds(0, 100, WIDTH, HEIGHT);
@@ -48,21 +54,20 @@ public class MapPanel extends JPanel implements KeyListener
     {
         System.out.println("Check for encounters...");
         Random rng = new Random();
-        if (rng.nextInt(encountercheck) + 1 == encountercheck)
+        if (rng.nextInt(encounterCheck) + 1 == encounterCheck)
         {
             System.out.println("Goblin attack!");
-            encountercheck = 20;
+            encounterCheck = encounterRate;
             GoblinHunter2.game.removeKeyListener(this);
             animate();
         }
         else
         {
-            encountercheck--;
+            encounterCheck--;
         }
     }
     public void animate()
     {
-        animation = 0;
         Timer timer = new Timer();
         TimerTask task = new TimerTask() 
         {

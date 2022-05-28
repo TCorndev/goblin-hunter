@@ -11,34 +11,14 @@ public class GoblinHunter2 {
     static StatusPanel status = new StatusPanel();
     static MapPanel map = new MapPanel();
     static CombatPanel combat = new CombatPanel();
-    
-    /* Player */
-    static HashMap<String, Integer> stats = new HashMap<>();
-    
-    static int EHP = 100;
+
+    static Player player;
+
+    static Timer timer = new Timer();
     public static void main (String[] args)
     {
-        setup();
-    }
-    public static void setup()
-    {
-        /* Declare player starting stats */
-        stats.put("HP", 10);
-        stats.put("MHP", 10);
-        stats.put("MP", 10);
-        stats.put("MMP", 10);
-        stats.put("MiATK", 1);
-        stats.put("MaATK", 5);
-        stats.put("MiSOL", 5);
-        stats.put("MaSOL", 8);
-        stats.put("DEF", 0);
-        stats.put("HREGEN", 0);
-        stats.put("MREGEN", 0);
-        stats.put("Speed", 10);
-        status.setStats(stats);
-
-        frame.add(game);
-        game.add(menu);
+        frame.add(game); //game added to frame
+        game.add(menu); //menu added to game
         frame.pack();
     }
     public static void close()
@@ -48,31 +28,36 @@ public class GoblinHunter2 {
     }
     public static void start()
     {
+        player = new Player(); // New player created
+        combat.setPlayer(player);
+        status.setPlayer(player);
         game.remove(menu);
         game.add(map);
         game.add(status);
         game.addKeyListener(map);
         game.repaint();
     }
+    public static void load()
+    {
+
+    }
     public static void combat()
     {
         game.remove(map);
         game.add(combat);
         game.addKeyListener(combat);
-        combat.setEHP(EHP);
+        Enemy Goblin = new Goblin();
+        combat.setEnemy(Goblin);
+        combat.resetThresholds();
+        combat.startCombat();
         game.repaint();
     }
     public static void map()
     {
         game.remove(combat);
+        game.removeKeyListener(combat);
         game.add(map);
         game.addKeyListener(map);
         game.repaint();
-    }
-    public static void attack()
-    {
-        EHP = EHP - (rng.nextInt(stats.get("MaATK") - stats.get("MiATK")) + stats.get("MiATK"));
-        combat.setEHP(EHP);
-        combat.repaint();
     }
 }

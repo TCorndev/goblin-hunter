@@ -10,24 +10,35 @@ import java.util.TimerTask;
 public class MapPanel extends JPanel implements KeyListener
 {
     ImageIcon icon = new ImageIcon("Test.png");
-    final int WIDTH = 1000;
-    final int HEIGHT = 900;
-    final int SIZE = 25;
+    private final int WIDTH = 1000;
+    private final int HEIGHT = 900;
+    private final int SIZE = 25;
 
-    int[] playerPos = new int[] {20, 18}; //Initial Player Starting Position
+    Player player;
+    boolean [][] occupied = new boolean [WIDTH / SIZE][HEIGHT / SIZE];
+    int[] shopPos = {20, 19};
+    int[] playerPos;
+    int x = 0;
+    int y = 1;
 
     int encounterRate = 20;
     int encounterCheck = encounterRate;
 
     int animation;
 
-    int level = 0;
+    int level = 1;
     MapPanel()
     {        
         this.setBounds(0, 100, WIDTH, HEIGHT);
         this.setBackground(Color.black);
         this.setFocusable(true);
         this.setVisible(true);
+        this.addKeyListener(this);
+    }
+    public void setPlayer(Player player)
+    {
+        this.player = player;
+        playerPos = player.getPlayerPos();
     }
     public void paintComponent(Graphics g)
     {
@@ -49,6 +60,29 @@ public class MapPanel extends JPanel implements KeyListener
             g.drawLine(0, HEIGHT - i, WIDTH, i);
         } 
         this.repaint();
+    }
+    private void movePlayer(int xy, int move)
+    {
+        occupied[10][10] = true;
+        int[] startPos = {playerPos[x], playerPos[y]}; //This temp variable takes in player's starting posistion before the move to easily move the player back if necessary
+        playerPos[xy] = playerPos[xy] + move;
+        if (playerPos[x] < 0 || playerPos[y] < 0 || playerPos[x] > WIDTH / SIZE - 1 || playerPos[y] > HEIGHT / SIZE - 1) //Keeps player in bounds
+        {
+            playerPos = startPos;
+        }
+        else if (occupied[playerPos[x]][playerPos[y]] == true) //Checks if space is occupied
+        {
+            playerPos = startPos;
+        }
+        else if (playerPos[x] == shopPos[x] && playerPos[y] == shopPos[y]) //Checks if space has a shop
+        {
+            playerPos = startPos;
+            GoblinHunter2.shop();
+        }
+        else
+        {
+            encounter(); //encounter checker only runs if player successfully moves
+        }
     }
     public void encounter()
     {
@@ -79,13 +113,17 @@ public class MapPanel extends JPanel implements KeyListener
             }
             else
             {
-                GoblinHunter2.combat();
+                startCombat();
                 animation = 0;
                 timer.cancel();
             }
-          }   
-        };
-        timer.scheduleAtFixedRate(task, 0, 1);
+        }   
+    };
+    timer.scheduleAtFixedRate(task, 0, 1);
+}
+    public void startCombat()
+    {
+    GoblinHunter2.combat(level);
     }
     @Override
     public void keyTyped(KeyEvent e) {
@@ -94,37 +132,25 @@ public class MapPanel extends JPanel implements KeyListener
     public void keyPressed(KeyEvent e) {
         switch(e.getKeyCode())
         {
+            //Left or A
             case 37:
             case 65:
-                if (playerPos[0] > 0)
-                {
-                    playerPos[0]--;
-                    encounter();
-                }
+                movePlayer(x, -1);
                 break;
+            //Up or W    
             case 38:
             case 87:
-                if (playerPos[1] > 0)
-                {
-                    playerPos[1]--;
-                    encounter();
-                }
+                movePlayer(y, -1);
                 break;
+            //Right or D
             case 68:
             case 39:
-                if (playerPos[0] < WIDTH / SIZE - 1)
-                {
-                    playerPos[0]++;
-                    encounter();
-                }
+                movePlayer(x, 1);
                 break;
+            //Down or S
             case 83:
             case 40:
-                if (playerPos[1] < HEIGHT / SIZE - 1)
-                {
-                    playerPos[1]++;
-                    encounter();
-                }
+                movePlayer(y, 1);
                 break;
             }
         this.repaint();

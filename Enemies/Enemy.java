@@ -1,3 +1,5 @@
+package Enemies;
+import java.util.Random;
 public abstract class Enemy 
 {
     
@@ -8,9 +10,12 @@ public abstract class Enemy
     protected int Speed;
     protected int Gold;
     protected int StatValue;
-    
-    Enemy(int HP, int MiATK, int MaATK, int Speed, int Gold)
+    protected String name;
+    protected Random rng = new Random();
+
+    Enemy(String name, int HP, int MiATK, int MaATK, int Speed, int Gold)
     {
+        this.name = name;
         this.HP = HP;
         this.MHP = HP;
         this.MiATK= MiATK;
@@ -37,6 +42,10 @@ public abstract class Enemy
     public int getStatValue()
     {
         return this.StatValue;
+    }
+    public String getName()
+    {
+        return this.name;
     }
   /*  public int getATK()
     {

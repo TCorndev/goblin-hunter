@@ -1,25 +1,34 @@
 import javax.swing.JPanel;
 
+import Enemies.Enemy;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
 public class CombatPanel extends JPanel implements KeyListener
 {
+    private final int COMBATBOXWIDTH = 80;
+    private final int COMBATBOXHEIGHT = 90;
     private final int THRESHOLD = 1000;
-    int EHP;
-    int cursorState;
-    Boolean playerTurn = false;
-    Boolean enemyTurn = false; //NYI
-    Boolean magic = false;
-    Boolean defend = false;
-    int playerActionThreshold = THRESHOLD;
-    int enemyActionThreshold = THRESHOLD;
-    HashMap<String, Integer> stats;
-    Timer timer;
+    private int cursorState;
+    /* Combat variables*/
+    private Enemy enemy;
+    private Boolean playerTurn = false;
+    //private Boolean enemyTurn = false; //NYI
+    private Boolean magic = false;
+    private Boolean defend = false;
     
-    Player player;
-    Enemy enemy;
+    private int playerActionThreshold = THRESHOLD;
+    private int enemyActionThreshold = THRESHOLD;
+    
+    private Timer timer;
+
+    /* Player Information */
+    private Player player;
+    private HashMap<String, Integer> stats;
+    private ArrayList<Item> items;
+    
     
     CombatPanel()
     {
@@ -33,8 +42,8 @@ public class CombatPanel extends JPanel implements KeyListener
     {
         super.paintComponent(g);
         draw(g);
-    }
-    public void draw(Graphics g)
+    } 
+    private void draw(Graphics g)
     {
         
         g.setFont(new Font("Courier New", Font.BOLD, 20));
@@ -42,8 +51,9 @@ public class CombatPanel extends JPanel implements KeyListener
 
         /* Player action box */
         g.setColor(Color.black);
-        g.fillRect(450, 800, 80, 100);
+        g.fillRect(450, 800, COMBATBOXWIDTH, COMBATBOXHEIGHT);
         g.setColor(Color.white);
+        g.drawRect(450, 800, COMBATBOXWIDTH, COMBATBOXHEIGHT);
         g.drawString("Attack", 455, 820);
         g.drawString("Magic", 455, 840);
         g.drawString("Defend", 455, 860);
@@ -51,27 +61,29 @@ public class CombatPanel extends JPanel implements KeyListener
 
         if (magic == true)
         {
+            /* Magic box */
             g.setColor(Color.black);
-            g.fillRect(540, 800, 80, 100);
+            g.fillRect(540, 800, COMBATBOXWIDTH, COMBATBOXHEIGHT);
             g.setColor(Color.white);
-            if (player.getMagicUnlocks(0) == true)
+            g.drawRect(540, 800, COMBATBOXWIDTH, COMBATBOXHEIGHT);
+            if (items.get(0).getUnlocked() == true)
             {
                 g.drawString("Heal", 545, 820);
             }
-            if (player.getMagicUnlocks(1) == true)
+            if (items.get(1).getUnlocked() == true)
             {
                 g.drawString("Fire",545 , 840);
             }
-            if (player.getMagicUnlocks(2) == true)
+            if (items.get(2).getUnlocked() == true)
             {
                 g.drawString("Haste", 545, 860);
             }
-            if (player.getMagicUnlocks(3) == true)
+            if (items.get(3).getUnlocked() == true)
             {
                 g.drawString("Shield", 545, 880);
             }
         }
-        
+        /* Cursor */
         if (playerTurn == true)
         {
             int cursorYOffset = cursorState * 20;
@@ -85,14 +97,15 @@ public class CombatPanel extends JPanel implements KeyListener
             g.fillPolygon(xpoints, ypoints, 3);
         }
     }
-    public void setEnemy(Enemy enemy)
-    {
-        this.enemy = enemy;
-    }
     public void setPlayer(Player player)
     {
         this.player = player;
         this.stats = player.getStats();
+        this.items = player.getItems();
+    }
+    public void setEnemy(Enemy enemy)
+    {
+        this.enemy = enemy;
     }
     public void resetThresholds()
     {
@@ -101,6 +114,8 @@ public class CombatPanel extends JPanel implements KeyListener
     }
     public void startCombat()
     {
+        playerTurn = false;
+        cursorState = 0;
         if (enemy.getHP() <= 0)
         {
             enemydefeated();
@@ -127,17 +142,16 @@ public class CombatPanel extends JPanel implements KeyListener
                     {
                         //enemyTurn = true; //Not yet relevant
                         enemyActionThreshold = enemyActionThreshold + THRESHOLD;
-    
-                        stats.replace("HP", stats.get("HP") - enemyDamage());
+                        enemyAttack();
                         //timer.cancel(); Activate this when animations are put in
-                        GoblinHunter2.game.repaint();
+                        GoblinHunter2.game.repaint(); //Normally animations will cover this repaint
                     }
                 }
             };
             timer.scheduleAtFixedRate(task, 0, 1);
         }
     }
-    public int enemyDamage()
+    private void enemyAttack()
     {
         int shieldValue = 1;
         if (defend == true)
@@ -149,16 +163,31 @@ public class CombatPanel extends JPanel implements KeyListener
         {
             damage = 0;
         }
+        stats.replace("HP", stats.get("HP") - damage);
+        if (stats.get("HP") <= 0)
+        {
+            GoblinHunter2.close();
+        }
         System.out.println(damage);
-        return damage;
     }
     public void attack()
     {
         Random rng = new Random();
         enemy.setHP(enemy.getHP() - (rng.nextInt(stats.get("MaATK") - stats.get("MiATK") + 1) + stats.get("MiATK")));
-        playerTurn = false;
         GoblinHunter2.game.repaint();
         startCombat();
+    }
+    private void flee()
+    {
+        if (stats.get("Speed") > enemy.getSpeed())
+        {
+            GoblinHunter2.map();
+        }
+        else
+        {
+            System.out.println("Not fast enough to escape!");
+            startCombat();
+        }
     }
     private void enter()
     {
@@ -175,10 +204,10 @@ public class CombatPanel extends JPanel implements KeyListener
                     break;
                 case 2: //Defend
                     defend = true;
-                    cursorState = 0;
                     startCombat();
                     break;
                 case 3: //Flee
+                    flee();
                     break;
             }
         }
@@ -205,8 +234,12 @@ public class CombatPanel extends JPanel implements KeyListener
             stats.replace(statdrop, stats.get(statdrop) + 1);
         }
         statcheck();
+        stats.replace("Gold", stats.get("Gold") + enemy.getGold());
+        System.out.println("Hi");
         GoblinHunter2.map();
     }
+
+    /* This method makes sure that minimum stats don't go above maximum stats. No 7-5 ATK here! May turn this into a static method in main and include HP */
     private void statcheck()
     {
         
@@ -219,30 +252,6 @@ public class CombatPanel extends JPanel implements KeyListener
             stats.replace("MiSOL", stats.get("MaSOL"));
         } 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	@Override
 	public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
@@ -283,8 +292,8 @@ public class CombatPanel extends JPanel implements KeyListener
                         magic = false;
                         cursorState = 0;
                     }
+                    break;
             }
-          //  playerAction(e.getKeyCode());
         }
         this.repaint();
 	}
@@ -293,7 +302,4 @@ public class CombatPanel extends JPanel implements KeyListener
 		// TODO Auto-generated method stub
 		
 	}
-    public void playerAction(int e)
-    {
-    }
 }

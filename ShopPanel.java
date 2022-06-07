@@ -91,6 +91,7 @@ public class ShopPanel extends JPanel implements KeyListener
     {
         Inventory.add(new Item("HP Restore", "Fully restore your HP", "(Cost determined based on missing HP)", stats.get("MHP") - stats.get("HP"), false));
         Inventory.add(new Item("MP Restore", "Fully restore your MP", "(Cost determined based on missing MP)", stats.get("MMP") - stats.get("MP"), false));
+        lastpage = 1;
         for(int i = 0; i < playerItems.size(); i++)
         {
             if (playerItems.get(i).getUnlocked() == false)
@@ -118,14 +119,14 @@ public class ShopPanel extends JPanel implements KeyListener
     private void buyItem()
     {
         int i = cursorState + PAGESIZE * (page - 1);
-        if (Inventory.get(i).getCost() <= stats.get("Gold"))
+        if (Inventory.get(i).getCost() <= stats.get("Gold")) 
         {
-            if (i == 0)
+            if (i == 0) //HP Restore
             {
                 stats.replace("Gold", stats.get("Gold") - Inventory.get(i).getCost());
                 stats.replace("HP", stats.get("MHP"));
             }
-            if (i == 1)
+            if (i == 1) //MP Restore
             {
                 stats.replace("Gold", stats.get("Gold") - Inventory.get(i).getCost());
                 stats.replace("MP", stats.get("MMP"));
@@ -134,10 +135,12 @@ public class ShopPanel extends JPanel implements KeyListener
             {
                 stats.replace("Gold", stats.get("Gold") - Inventory.get(i).getCost());
                 Inventory.get(i).setUnlocked(true);
+                player.Unlock(Inventory.get(i).getName());
             }
             Inventory.clear();
             setup();
         }
+        GoblinHunter2.game.repaint();
     }
     public void resetShop()
     {
@@ -145,7 +148,6 @@ public class ShopPanel extends JPanel implements KeyListener
         shopSpeech2 = "(Press any key to shop)";
         cost = "";
         shopping = false;
-        lastpage = 1;
         page = 1;
         cursorState = 0;
         Inventory.clear(); 

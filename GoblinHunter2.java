@@ -23,6 +23,7 @@ public class GoblinHunter2 {
         frame.add(game); //game added to frame
         game.add(menu); //menu added to game
         frame.pack();
+        frame.setLocationRelativeTo(null);
     }
     public static void close()
     {
@@ -95,6 +96,7 @@ public class GoblinHunter2 {
                 System.out.println("RandomEncounter 1 default called"); //Change to throw exception
                 enemy = new Goblin();
                 break;
+
         }
         System.out.println(enemy.getName());
         return enemy;

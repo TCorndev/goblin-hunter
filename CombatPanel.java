@@ -235,7 +235,6 @@ public class CombatPanel extends JPanel implements KeyListener
         }
         statcheck();
         stats.replace("Gold", stats.get("Gold") + enemy.getGold());
-        System.out.println("Hi");
         GoblinHunter2.map();
     }
 

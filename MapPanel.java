@@ -9,7 +9,8 @@ import java.util.TimerTask;
 
 public class MapPanel extends JPanel implements KeyListener
 {
-    ImageIcon icon = new ImageIcon("Test.png");
+    ImageIcon playerIcon = new ImageIcon("Test.png");
+    ImageIcon shopIcon = new ImageIcon();
     private final int WIDTH = 1000;
     private final int HEIGHT = 900;
     private final int SIZE = 25;
@@ -52,7 +53,7 @@ public class MapPanel extends JPanel implements KeyListener
             g.drawLine(0, i*SIZE, WIDTH, i*SIZE);
             g.setColor(Color.white);
         } */
-        g.drawImage(icon.getImage(), playerPos[0] * SIZE, playerPos[1] * SIZE, null);
+        g.drawImage(playerIcon.getImage(), playerPos[0] * SIZE, playerPos[1] * SIZE, null);
         for(int i = 0; i < animation; i++)
         {
             g.setColor(Color.blue);

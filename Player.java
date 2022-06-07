@@ -23,7 +23,7 @@ public class Player {
         stats.put("HREGEN", 0);
         stats.put("MREGEN", 0);
         stats.put("Speed", 10);
-        stats.put("Gold", 1000);
+        stats.put("Gold", 10000000);
 
         /*Unlocks(Items, Spells, etc.. Bought in store) */
         //Spells
@@ -31,10 +31,9 @@ public class Player {
         items.add(new Item("Scroll of Fire", "This scroll will unlock the Fire spell!", "(Does damage equal to 5 times your SOL)", 100, false));
         items.add(new Item("Scroll of Haste", "This scroll will unlock the Haste spell!", "(Greatly increases your speed, allowing for more attacks)", 500, false));
         items.add(new Item("Scroll of Shield", "This scroll will unlock the Shield spell", "(Greatly reduces your damage taken)", 2000, false));
-
-
-
+        
         //Items
+        items.add(new Item("Leather Armor", "This Armor will reduce the damage you take!", "(DEF + 1)", 10, false));
 
         /* Starting Equipment Levels */
         swordLevel = 1;
@@ -69,8 +68,27 @@ public class Player {
     {
         stats.replace("Gold", stats.get("Gold") - cost);
     }
-    public void update()
+    public void Unlock(String name)
     {
-        
+        switch(name)
+        {
+            case "Leather Armor":
+                items.add(new Item("Iron Armor", "This Armor will reduce the damage you take!", "(DEF + 1)", 200, false));
+                stats.replace("DEF", stats.get("DEF") + 1);
+                break;
+            case "Iron Armor":
+                items.add(new Item("Steel Armor", "This Armor will reduce the damage you take!", "(DEF + 1)", 3000, false));
+                stats.replace("DEF", stats.get("DEF") + 1);
+                break;
+            case "Steel Armor":
+                items.add(new Item("Crystal Armor", "This Armor will reduce the damage you take!", "(DEF + 1)", 40000, false));
+                stats.replace("DEF", stats.get("DEF") + 1);
+                break;
+            case "Crystal Armor":
+                stats.replace("DEF", stats.get("DEF") + 1);
+                break;
+            default:
+                break;
+        }
     }
 }

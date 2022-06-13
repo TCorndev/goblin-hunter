@@ -4,7 +4,7 @@ public class Goblin extends Enemy
 {
     public Goblin() 
     {
-        super("Goblin",20, 1, 3, 9, 3);
+        super("Goblin",20, 1, 3, 9, 3, false);
     }
     @Override
     public int Action()

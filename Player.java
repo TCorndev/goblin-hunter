@@ -1,7 +1,8 @@
 import java.util.HashMap;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Player {
+public class Player implements Serializable {
     private HashMap<String, Integer> stats = new HashMap<>(); //Contains stats
     private ArrayList<Item> items = new ArrayList<>();
     private int swordLevel;

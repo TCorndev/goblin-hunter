@@ -1,3 +1,7 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 import Enemies.*;
 
@@ -33,6 +37,17 @@ public class GoblinHunter2 {
     public static void start()
     {
         player = new Player(); // New player created
+        startgame();
+    }
+    public static void load() throws FileNotFoundException, IOException, ClassNotFoundException
+    {
+        ObjectInputStream load = new ObjectInputStream(new FileInputStream("Save.txt"));
+        player = (Player) load.readObject();
+        load.close();
+        startgame();
+    }
+    public static void startgame()
+    {
         status.setPlayer(player);
         map.setPlayer(player);
         combat.setPlayer(player);
@@ -43,63 +58,16 @@ public class GoblinHunter2 {
         game.addKeyListener(map);
         game.repaint();
     }
-    public static void load()
-    {
-        
-    }
-    public static void combat(int level)
+    public static void combat(Enemy enemy)
     {
         game.remove(map);
         game.removeKeyListener(map);
         game.add(combat);
         game.addKeyListener(combat);
-        Enemy enemy;
-        switch(level)
-        {
-            case 1:
-                enemy = randomEncounter1();
-                break;
-            default:
-                System.out.println("Combat default called");
-                enemy = new Goblin(); //This should never happen
-                break;
-        }
         combat.setEnemy(enemy);
         combat.resetThresholds();
         combat.startCombat();
         game.repaint();
-    }
-    private static Enemy randomEncounter1()
-    {
-        Random rng = new Random();
-        Enemy enemy;
-        int encounter = rng.nextInt(9);
-        switch(encounter)
-        {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                enemy = new Goblin();
-                break;
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-                enemy = new GoblinShaman();
-                break;
-            case 8:
-            case 9:
-                enemy = new GoblinFly();
-                break;
-            default:
-                System.out.println("RandomEncounter 1 default called"); //Change to throw exception
-                enemy = new Goblin();
-                break;
-
-        }
-        System.out.println(enemy.getName());
-        return enemy;
     }
     public static void map()
     {

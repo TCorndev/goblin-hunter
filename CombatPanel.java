@@ -207,7 +207,14 @@ public class CombatPanel extends JPanel implements KeyListener
                     startCombat();
                     break;
                 case 3: //Flee
-                    flee();
+                    if (enemy.getBoss() == false)
+                    {
+                        flee();
+                    }
+                    else
+                    {
+                        System.out.println("There's no running from this!");
+                    }
                     break;
             }
         }

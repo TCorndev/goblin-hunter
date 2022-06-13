@@ -11,9 +11,10 @@ public abstract class Enemy
     protected int Gold;
     protected int StatValue;
     protected String name;
+    protected boolean boss;
     protected Random rng = new Random();
 
-    Enemy(String name, int HP, int MiATK, int MaATK, int Speed, int Gold)
+    Enemy(String name, int HP, int MiATK, int MaATK, int Speed, int Gold, boolean boss)
     {
         this.name = name;
         this.HP = HP;
@@ -22,6 +23,7 @@ public abstract class Enemy
         this.MaATK = MaATK;
         this.Speed = Speed;
         this.Gold = Gold;
+        this.boss = boss;
     }
     public int getHP()
     {
@@ -46,6 +48,10 @@ public abstract class Enemy
     public String getName()
     {
         return this.name;
+    }
+    public boolean getBoss()
+    {
+        return this.boss;
     }
   /*  public int getATK()
     {

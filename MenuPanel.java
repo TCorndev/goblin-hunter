@@ -7,6 +7,7 @@ public class MenuPanel extends JPanel implements ActionListener
 {
     JButton StartButton = new JButton();
     JButton ExitButton = new JButton();
+    JButton LoadButton = new JButton();
 
     MenuPanel()
     {
@@ -17,9 +18,13 @@ public class MenuPanel extends JPanel implements ActionListener
         this.setLayout(null);
         this.add(StartButton);
         this.add(ExitButton);
+        this.add(LoadButton);
         StartButton.setBounds(450, 700, 100, 25);
         StartButton.setText("Start!");
         StartButton.addActionListener(this);
+        LoadButton.setBounds(450, 800, 100, 25);
+        LoadButton.setText("Load");
+        LoadButton.addActionListener(this);
         ExitButton.setBounds(450, 900, 100, 25);
         ExitButton.setText("Exit Game");
         ExitButton.addActionListener(this);
@@ -29,6 +34,16 @@ public class MenuPanel extends JPanel implements ActionListener
         if (event.getSource() == StartButton) 
         {
             GoblinHunter2.start();
+        }
+        if (event.getSource() == LoadButton)
+        {
+            try 
+            {
+                GoblinHunter2.load();
+            } catch (Exception e) 
+            {
+                System.out.println(e);
+            }
         }
         if (event.getSource() == ExitButton)
         {

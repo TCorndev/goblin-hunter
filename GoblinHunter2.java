@@ -5,7 +5,8 @@ import java.io.ObjectInputStream;
 import java.util.*;
 import Enemies.*;
 
-public class GoblinHunter2 {
+public class GoblinHunter2 
+{
     /* Basic elements */
     static Scanner sc = new Scanner(System.in);
     static GameFrame frame = new GameFrame();
@@ -16,8 +17,6 @@ public class GoblinHunter2 {
     static MapPanel map = new MapPanel();
     static CombatPanel combat = new CombatPanel();
     static ShopPanel shop = new ShopPanel();
-
-
     
     static Player player;
     
@@ -64,9 +63,7 @@ public class GoblinHunter2 {
         game.removeKeyListener(map);
         game.add(combat);
         game.addKeyListener(combat);
-        combat.setEnemy(enemy);
-        combat.resetThresholds();
-        combat.startCombat();
+        combat.setup(enemy);
         game.repaint();
     }
     public static void map()
@@ -87,6 +84,14 @@ public class GoblinHunter2 {
         game.addKeyListener(shop);
         shop.resetShop();
         shop.setup();
+        game.repaint();
+    }
+    public static void gameover()
+    {
+        game.remove(combat);
+        game.removeKeyListener(combat);
+        game.remove(status);
+        game.add(menu);
         game.repaint();
     }
 }

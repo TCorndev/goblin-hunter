@@ -1,5 +1,7 @@
 package Enemies;
 import java.util.Random;
+
+import javax.swing.ImageIcon;
 public abstract class Enemy 
 {
     
@@ -12,7 +14,10 @@ public abstract class Enemy
     protected int StatValue;
     protected String name;
     protected boolean boss;
+    protected String dialogue;
     protected Random rng = new Random();
+    protected ImageIcon sprite;
+    private ImageIcon background;
 
     Enemy(String name, int HP, int MiATK, int MaATK, int Speed, int Gold, boolean boss)
     {
@@ -53,18 +58,33 @@ public abstract class Enemy
     {
         return this.boss;
     }
-  /*  public int getATK()
+    public String getDialogue()
     {
-        return ATK;
+        return this.dialogue;
     }
-    public void setATK(int ATK)
+    public ImageIcon getSprite()
     {
-        this.ATK = ATK;
+        return sprite;
     }
-    public void setSpeed(int Speed)
+    public ImageIcon getBackground(int level)
     {
-        this.Speed = Speed;
-    } */
+        switch (level)
+        {
+            case 0:
+                background = new ImageIcon("Assets/Tutorial Battle.png");
+                break;
+            case 1:
+                background = new ImageIcon("Assets/Fields Battle.png");
+                break;
+            case 2:
+                background = new ImageIcon("Assets/Cave Battle.png");
+                break;
+            case 3:
+                background = new ImageIcon("Assets/Castle Battle.png");
+                break;
+        }
+        return background;
+    }
     public abstract int Action();
     public abstract String statDrop();
 }

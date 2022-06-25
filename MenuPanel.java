@@ -1,4 +1,5 @@
 import javax.swing.JPanel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.*;
 import java.awt.event.*;
@@ -8,11 +9,12 @@ public class MenuPanel extends JPanel implements ActionListener
     JButton StartButton = new JButton();
     JButton ExitButton = new JButton();
     JButton LoadButton = new JButton();
+    ImageIcon title = new ImageIcon("Assets/Title.png");
 
     MenuPanel()
     {
         this.setBounds(0, 0, 1000, 1000);
-        this.setBackground(Color.green);
+        this.setBackground(Color.black);
         this.setFocusable(true);
         this.setVisible(true);
         this.setLayout(null);
@@ -28,7 +30,16 @@ public class MenuPanel extends JPanel implements ActionListener
         ExitButton.setBounds(450, 900, 100, 25);
         ExitButton.setText("Exit Game");
         ExitButton.addActionListener(this);
-    }    
+    }
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        draw(g);
+    }
+    public void draw(Graphics g)
+    {
+        g.drawImage(title.getImage(), 250, 300, null);
+    }
     public void actionPerformed(ActionEvent event)
     {
         if (event.getSource() == StartButton) 

@@ -24,11 +24,11 @@ public class MapPanel extends JPanel implements KeyListener
 
     Player player;
     private Level location;
-    int level = 1;
+
     boolean [][] occupied = new boolean [WIDTH / SIZE][HEIGHT / SIZE];
     boolean [][] special = new boolean [WIDTH / SIZE][HEIGHT / SIZE];
 
-    int[] shopPos = {20, 19};
+    //int[] shopPos = {20, 19};
     int[] playerPos;
     int x = 0;
     int y = 1;
@@ -41,7 +41,6 @@ public class MapPanel extends JPanel implements KeyListener
     private int cursorState = 0;
 
     boolean dialoguebox = false;
-    private String dialogue;
 
     int animation;
 
@@ -52,12 +51,12 @@ public class MapPanel extends JPanel implements KeyListener
         this.setFocusable(true);
         this.setVisible(true);
         this.addKeyListener(this);
-        createLevel();
     }
     public void setPlayer(Player player)
     {
         this.player = player;
         playerPos = player.getPlayerPos();
+        createLevel();
     }
     public void paintComponent(Graphics g)
     {
@@ -75,25 +74,22 @@ public class MapPanel extends JPanel implements KeyListener
         /* Images drawn */
         g.drawImage(background.getImage(), 0, 0, null);
         g.drawImage(playerIcon.getImage(), playerPos[0] * SIZE, playerPos[1] * SIZE, null);
-        g.drawImage(shopIcon.getImage(), shopPos[0] * SIZE, shopPos[1] * SIZE, null);
 
-
-        /* Collision */
-        g.setFont(new Font("Courier New", Font.BOLD, 10));
-
-        for(int i = 0; i < WIDTH / SIZE; i++)
+        
+        /* Coords, delete this */
+       /* for(int i = 0; i < WIDTH / SIZE; i++)
         {
             for (int j = 0; j < HEIGHT / SIZE; j++)
             {
+                g.setFont(new Font("Courier New", Font.BOLD, 10));
                 g.setColor(Color.white);
                 g.drawString(i + "", i * SIZE, j * SIZE - 10 + SIZE);
                 g.drawString(j + "", i * SIZE, j * SIZE + SIZE); 
-                if (occupied[i][j] == true)
-                {
-      //              g.drawImage(boulderIcon.getImage(), i * SIZE, j * SIZE, null); // In the future collision will be done via background image
-                }
             }
-        }
+        } */
+        
+        /*Font set */
+        g.setFont(new Font("Courier New", Font.BOLD, 20));
 
         /* Menu */
         if (menu == true)
@@ -104,10 +100,16 @@ public class MapPanel extends JPanel implements KeyListener
             g.setColor(Color.white);
             g.drawRect(460, 405, 80, 90);
             
-            g.setFont(new Font("Courier New", Font.BOLD, 20));
             g.drawString("Resume", 465, 425);
             g.drawString("Save", 465, 445);
-            g.drawString("Heal", 465, 465);
+            if (player.getMagicUnlock()[0] == true)
+            {
+                g.drawString("Heal", 465, 465);
+            }
+            else
+            {
+                g.drawString("????", 465, 465);
+            }
             g.drawString("Quit", 465, 485);
 
             /* Cursor */
@@ -115,6 +117,16 @@ public class MapPanel extends JPanel implements KeyListener
             int[] xpoints = {545, 555, 555};
             int[] ypoints = {420 + cursorYOffset, 410 + cursorYOffset, 430 + cursorYOffset};
             g.fillPolygon(xpoints, ypoints, 3);
+        }
+        /* Dialogue Box */
+        if (dialoguebox == true)
+        {
+            g.setColor(Color.black);
+            g.fillRect(200, 200, 600, 60);
+            g.setColor(Color.white);
+            g.drawRect(200, 200, 600, 60);
+            g.drawString(location.getDialogue(), 205, 220);
+            g.drawString(location.getDialogue2(), 205, 240);
         }
 
         /* Combat starting animation */
@@ -132,33 +144,32 @@ public class MapPanel extends JPanel implements KeyListener
         playerPos[xy] = playerPos[xy] + move;
         if (playerPos[x] < 0 || playerPos[y] < 0 || playerPos[x] > WIDTH / SIZE - 1 || playerPos[y] > HEIGHT / SIZE - 1) //Keeps player in bounds
         {
-            playerPos = startPos;
+            playerPos[x] = startPos[x];
+            playerPos[y] = startPos[y];
         }
         else if (occupied[playerPos[x]][playerPos[y]] == true) //Checks if space is occupied
         {
-            playerPos = startPos;
+            playerPos[x] = startPos[x];
+            playerPos[y] = startPos[y];
         }
         else if (special[playerPos[x]][playerPos[y]] == true) // Checks for a special event
         {
             event(location.special(playerPos[x], playerPos[y]));
         }
-        else if (playerPos[x] == shopPos[x] && playerPos[y] == shopPos[y]) //Checks if space has a shop
-        {
-            playerPos = startPos;
-            GoblinHunter2.shop();
-        }
         else
         {
-            encounter(); //encounter checker only runs if player successfully moves
+            player.regen();
+            if (player.getLevel() > 0)
+            {
+                encounter(); //encounter checker only runs if player successfully moves and player is not on tutorial level
+            }
         }
     }
     public void encounter()
     {
-        System.out.println("Check for encounters...");
         Random rng = new Random();
         if (rng.nextInt(encounterCheck) + 1 == encounterCheck)
         {
-            System.out.println("Goblin attack!");
             encounterCheck = encounterRate;
             enemy = location.RandomEncounter();
             animate();
@@ -208,6 +219,11 @@ public class MapPanel extends JPanel implements KeyListener
                 }
                 break;
             case 2: //Heal
+                if (player.getMagicUnlock()[0] == true)
+                {
+                    player.heal();
+                }
+                break;
             case 3: //Quit
                 GoblinHunter2.close();
                 break;
@@ -221,24 +237,26 @@ public class MapPanel extends JPanel implements KeyListener
     }
     private void createLevel()
     {
-        switch(level)
+        switch(player.getLevel())
         {
             case 0: //Tutorial
+                location = new Tutorial(WIDTH / SIZE, HEIGHT / SIZE);
                 break;
             case 1: //Fields
-                for (int i = 0; i < WIDTH / SIZE; i++)
-                {
-                    background.setImage(new ImageIcon("Assets/Fields.png").getImage());
-                    location = new Fields(WIDTH / SIZE, HEIGHT / SIZE);
-                    occupied = location.getOccupied();
-                    special = location.getSpecial();
-                }
+                location = new Fields(WIDTH / SIZE, HEIGHT / SIZE);
                 break;
-            case 2: //Tunnel
+            case 2: //Cave
+                location = new Cave(WIDTH / SIZE, HEIGHT / SIZE);
                 break;
             case 3: //Castle
+                location = new Castle(WIDTH / SIZE, HEIGHT / SIZE);
                 break;
         }
+
+        background.setImage(location.getImageIcon().getImage());
+        occupied = location.getOccupied();
+        special = location.getSpecial();
+        GoblinHunter2.game.repaint();
     }
     private void event(int eventNumber)
     {
@@ -246,24 +264,73 @@ public class MapPanel extends JPanel implements KeyListener
         {
             case 0: //Dialogue
                 dialoguebox = true;
-                dialogue = location.getDialogue();
                 break;
             case 1: //Baby Goblin
+                if (player.getBossKills()[0] == false)
+                {
+                    enemy = new BabyGoblin();
+                    animate();
+                    player.setBossKills(0);
+                }
                 break;
             case 2: //Tutorial Exit
-                level = 1;
+                player.setLevel(1);
+                player.fullheal();
+                playerPos[x] = 20;
+                playerPos[y] = 30;
                 createLevel();
                 break;
             case 3: //Bridge Goblin
-                enemy = new BridgeGoblin();
-                animate();
+                if (player.getBossKills()[1] == false)
+                {
+                    enemy = new BridgeGoblin();
+                    animate();
+                    player.setBossKills(1);
+                }
                 break;
             case 4: //Entering Cave
-                level = 2;
-                createLevel();;
-            case 5: //Exiting Cave to Fields
-                level = 1;
+                player.setLevel(2);
+                playerPos[x] = 4;
+                playerPos[y] = 34;
                 createLevel();
+                break;
+            case 5: //Shop
+                GoblinHunter2.shop();
+                break;
+            case 6: //Exiting Cave to Fields
+                player.setLevel(1);
+                playerPos[x] = 4;
+                playerPos[y] = 5;
+                createLevel();
+                break;
+            case 7: //Healing Fountain
+                player.fullheal();
+                dialoguebox = true;
+                break;
+            case 8: //Rock Goblin
+                if (player.getBossKills()[2] == false)
+                {
+                    enemy = new RockGoblin();
+                    animate();
+                    player.setBossKills(2);
+                }
+                break;
+            case 9: //Exiting Cave to Castle
+                player.setLevel(3);
+                playerPos[x] = 19;
+                playerPos[y] = 34;
+                createLevel();
+                break;
+            case 10: //Exiting Castle to Cave
+                player.setLevel(2);
+                playerPos[x] = 33;
+                playerPos[y] = 1;
+                createLevel();
+                break;
+            case 11: //Goblin King
+                enemy = new GoblinKing();
+                animate();
+                break;
         }
     }
     @Override
@@ -312,7 +379,14 @@ public class MapPanel extends JPanel implements KeyListener
         }
         else if (dialoguebox == true) // Dialoguebox
         {
-
+            switch(e.getKeyCode())
+            {
+                //Enter or Escape
+                case 10:
+                case 27:
+                    dialoguebox = false;
+                    break;
+            }
         }
         else // Movement
         {

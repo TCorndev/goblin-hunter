@@ -1,15 +1,32 @@
 package Enemies;
 
+import javax.swing.ImageIcon;
+
 public class GoblinFly extends Enemy 
 {
     public GoblinFly()
     {
-        super("Goblin Fly",5, 1, 2, 30, 1,false);
+        super("Goblin Fly",5, 1, 1, 30, 1,false);
+        sprite = new ImageIcon("Assets/Test.png");
+
     }
     @Override
     public int Action() 
     {
-        int damage = rng.nextInt(MaATK - MiATK + 1) + MiATK;
+        int action = rng.nextInt(4);
+        int damage = 0;
+        switch (action)
+        {
+            case 0:
+            case 1:
+            case 2:
+                damage = rng.nextInt(MaATK - MiATK + 1) + MiATK;
+                break;
+            case 3:
+                this.MaATK++;
+                this.dialogue = this.name + "'s buzzing grows more ferocious!";
+                break;
+        }
         return damage;
     }
 

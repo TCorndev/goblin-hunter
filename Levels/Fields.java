@@ -2,15 +2,19 @@ package Levels;
 
 import java.util.Random;
 
+import javax.swing.ImageIcon;
+
 import Enemies.*;
 
 public class Fields extends Level
 {
     private int bridgeEvent = 3;
     private int caveExit = 4;
+    private int shop = 5;
     public Fields(int width, int height)
     {
         super(width, height);
+        image = new ImageIcon("Assets/Fields.png");
         setup();
     }
 
@@ -38,6 +42,8 @@ public class Fields extends Level
         occupied[7][21] = true;
         occupied[31][31] = true;
 
+        /* Shop */
+        special[20][19] = true;
     }
 
     @Override
@@ -51,6 +57,11 @@ public class Fields extends Level
         else if (xPos == 4 && yPos == 3)
         {
             eventNumber = caveExit;
+        }
+        else if (xPos == 20 && yPos == 19)
+        {
+            eventNumber = shop;
+            System.out.println("Attempting to shop");
         }
         return eventNumber;
     }
@@ -83,9 +94,7 @@ public class Fields extends Level
                 System.out.println("RandomEncounter 1 default called"); //Change to throw exception
                 enemy = new Goblin();
                 break;
-
         }
-        System.out.println(enemy.getName());
         return enemy;
     }
     

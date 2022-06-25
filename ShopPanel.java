@@ -17,6 +17,7 @@ public class ShopPanel extends JPanel implements KeyListener
     private String shopSpeech1;
     private String shopSpeech2;
     private String cost;
+    private boolean exitShop;
     /*Item Box & cursor */
     private int cursorState;
     private int page;
@@ -33,7 +34,7 @@ public class ShopPanel extends JPanel implements KeyListener
     ShopPanel()
     {
         this.setBounds(0, 100, WIDTH, HEIGHT);
-        this.setBackground(Color.blue);
+        this.setBackground(Color.black);
         this.setFocusable(true);
         this.setVisible(true);
     }
@@ -105,11 +106,47 @@ public class ShopPanel extends JPanel implements KeyListener
             lastpage++;
             inventorySize = inventorySize - PAGESIZE;
         }
+        if (cursorState >= inventorySize && page == lastpage)
+        {
+            cursorState = inventorySize - 1;
+        }
+        if (page > lastpage)
+        {
+            page = lastpage;
+        }
+    }
+    private void movecursor(int move)
+    {
+        cursorState = cursorState + move;
+        if (page == lastpage)
+        {
+            int max = (Inventory.size() - (lastpage - 1) * PAGESIZE) - 1;
+            System.out.println(max);
+            if (cursorState < 0)
+            {
+                cursorState = max;
+            }
+            if (cursorState > max)
+            {
+                cursorState = 0;
+            }
+        }
+        else
+        {
+            if (cursorState < 0)
+            {
+                cursorState = 3;
+            }
+            if (cursorState > 3)
+            {
+                cursorState = 0;
+            }
+        }
     }
     private void itemSelected()
     {
         int i = cursorState + PAGESIZE * (page - 1);
-        if (i < Inventory.size())
+        if (i < Inventory.size() && shopping == true)
         {
             shopSpeech1 = Inventory.get(i).getDescription1();
             shopSpeech2 = Inventory.get(i).getDescription2();
@@ -142,12 +179,43 @@ public class ShopPanel extends JPanel implements KeyListener
         }
         GoblinHunter2.game.repaint();
     }
+    private void hintdialogue()
+    {
+        int progress = 0;
+        for (int i = 0; i < player.getBossKills().length; i++)
+        {
+            if (player.getBossKills()[i] == false)
+            {
+                progress = i;
+                System.out.println(i);
+                break;
+            }
+        }
+        switch(progress)
+        {
+            case 1: //Baby Goblin defeated
+                shopSpeech1 = "A Powerful Goblin defends the bridge";
+                shopSpeech2 = "Make sure you're prepared before attempting to cross it.";
+                break;
+            case 2: //Bridge Goblin defeated
+                shopSpeech1 = "The cave is full of dangerous foes";
+                shopSpeech2 = "A shield spell will help you survive";
+                break;
+            case 3: //Rock Goblin defeated
+                shopSpeech1 = "The castle sits atop a volcano";
+                shopSpeech2 = "Are you powerful enough to dethrone the Goblin King?";
+                break;
+            default:
+                break;
+        }
+    }
     public void resetShop()
     {
         shopSpeech1 = "Welcome to my shop. Please take a look around.";
         shopSpeech2 = "(Press any key to shop)";
         cost = "";
         shopping = false;
+        exitShop = false;
         page = 1;
         cursorState = 0;
         Inventory.clear(); 
@@ -161,7 +229,15 @@ public class ShopPanel extends JPanel implements KeyListener
     @Override
     public void keyPressed(KeyEvent e) 
     {
-        if (shopping == true)
+        if (exitShop == true)
+        {
+            GoblinHunter2.map();
+        }
+        else if (shopping == false)
+        {
+            shopping = true;
+        }
+        else if (shopping == true)
         {
             switch(e.getKeyCode())
             {
@@ -173,18 +249,12 @@ public class ShopPanel extends JPanel implements KeyListener
                 //Up or W
                 case 38:
                 case 87:
-                    if (cursorState > 0)
-                    {
-                        cursorState--;
-                    }
+                    movecursor(-1);
                     break;
                 //Down or S    
                 case 40:
                 case 83:
-                    if (cursorState < 3)
-                    {
-                        cursorState++;
-                    }
+                    movecursor(1);
                     break;
                 //Left or A
                 case 37:
@@ -206,15 +276,13 @@ public class ShopPanel extends JPanel implements KeyListener
                     break;
                 //Escape
                 case 27:
-                    GoblinHunter2.map();
+                    exitShop = true;
+                    shopping = false;
+                    hintdialogue();
                     break;
             }
+            itemSelected();
         }
-        else
-        {
-            shopping = true;
-        }
-        itemSelected();
         this.repaint();
     }
 

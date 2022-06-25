@@ -1,16 +1,21 @@
 package Enemies;
 
+import javax.swing.ImageIcon;
+
 public class GoblinShaman extends Enemy
 {
     public GoblinShaman()
     {
         super("Goblin Shaman",12, 1, 2, 7, 2,false);
+        sprite = new ImageIcon("Assets/Test.png");
+
     }
     @Override
     public int Action() 
     {
         int action = rng.nextInt(2);
         int damage = 0;
+        int healing = 4;
         switch(action)
         {
             case 0:
@@ -19,16 +24,16 @@ public class GoblinShaman extends Enemy
             case 1:
                 if(this.HP < this.MHP)
                 {
-                    this.HP = this.HP + 4;
+                    this.HP = this.HP + healing;
                     if (this.HP > this.MHP)
                     {
                         this.HP = this.MHP;
                     }
+                    this.dialogue = this.name + " restores " + healing + " health!";
                 }
                 else
                 {
                     Action();
-                    System.out.println("Recursion");
                 }
                 break;
         }

@@ -1,14 +1,11 @@
 package Enemies;
 
-import javax.swing.ImageIcon;
-
 public class GoblinDarkMage extends Enemy
 {
     private boolean channeling = false;
     public GoblinDarkMage()
     {
-        super("Goblin Dark Mage",40, 3, 4, 15, 2,false);
-        sprite = new ImageIcon("Assets/Test.png");
+        super("Goblin Dark Mage",40, 3, 4, 15, 30,false);
 
     }
     @Override

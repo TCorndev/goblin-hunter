@@ -29,6 +29,7 @@ public abstract class Enemy
         this.Speed = Speed;
         this.Gold = Gold;
         this.boss = boss;
+        sprite = new ImageIcon("Assets/Enemies/" + this.name + ".png");
     }
     public int getHP()
     {

@@ -1,11 +1,9 @@
 import javax.swing.JPanel;
-import java.util.*;
 import java.awt.*;
 
 public class StatusPanel extends JPanel 
 {
-    HashMap<String, Integer> stats = new HashMap<>();
-    Player player;
+    private Player player;
     StatusPanel()
     {
         this.setBounds(0, 0, 1000, 100);
@@ -21,22 +19,21 @@ public class StatusPanel extends JPanel
     public void draw(Graphics g)
     {
         g.setFont(new Font("Courier New", Font.BOLD, 20));
-        g.drawString("HP: " + stats.get("HP") + "/" + stats.get("MHP"), 0, 15);
-        g.drawString("MP: " + stats.get("MP") + "/" + stats.get("MMP"), 0, 30);
+        g.drawString("HP: " + player.getStats().get("HP") + "/" + player.getStats().get("MHP"), 0, 15);
+        g.drawString("MP: " + player.getStats().get("MP") + "/" + player.getStats().get("MMP"), 0, 30);
         g.drawString("Power: " + String.format("%.2f", player.getCompletionPercentage()) + "%", 0, 90);
 
-        g.drawString("ATK: " + stats.get("MiATK") + "-" + stats.get("MaATK") + "  x" + player.getSwordLevel(), 500, 15);
-        g.drawString("SOL: " + stats.get("MiSOL") + "-" + stats.get("MaSOL"), 500, 30);
-        g.drawString("DEF: " + stats.get("DEF"), 500, 45);
-        g.drawString("HP Regen: " + stats.get("HREGEN"), 500, 60);
-        g.drawString("MP Regen: " + stats.get("MREGEN"), 500, 75);
-        g.drawString("Speed: " + stats.get("Speed"), 500, 90);
+        g.drawString("ATK: " + player.getStats().get("MiATK") + "-" + player.getStats().get("MaATK") + "  x" + player.getSwordLevel(), 500, 15);
+        g.drawString("SOL: " + player.getStats().get("MiSOL") + "-" + player.getStats().get("MaSOL"), 500, 30);
+        g.drawString("DEF: " + player.getStats().get("DEF"), 500, 45);
+        g.drawString("HP Regen: " + player.getStats().get("HREGEN"), 500, 60);
+        g.drawString("MP Regen: " + player.getStats().get("MREGEN"), 500, 75);
+        g.drawString("Speed: " + player.getStats().get("Speed"), 500, 90);
 
-        g.drawString("Gold:" + stats.get("Gold"), 800, 15);
+        g.drawString("Gold:" + player.getStats().get("Gold"), 800, 15);
     }
     public void setPlayer(Player player)
     {
         this.player = player;
-        this.stats = player.getStats();
     }
 }

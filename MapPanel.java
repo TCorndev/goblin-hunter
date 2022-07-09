@@ -15,34 +15,33 @@ import Enemies.*;
 public class MapPanel extends JPanel implements KeyListener
 {
     ImageIcon playerIcon = new ImageIcon("Assets/Hero.png");
-    ImageIcon shopIcon = new ImageIcon("Assets/Shop.png");
     ImageIcon background = new ImageIcon("Assets/Fields.png");
     
+    private Player player;
+    private Level location;
+    private Enemy enemy;
+
     private final int WIDTH = 1000;
     private final int HEIGHT = 900;
     private final int SIZE = 25;
 
-    Player player;
-    private Level location;
 
-    boolean [][] occupied = new boolean [WIDTH / SIZE][HEIGHT / SIZE];
-    boolean [][] special = new boolean [WIDTH / SIZE][HEIGHT / SIZE];
+    private boolean [][] occupied = new boolean [WIDTH / SIZE][HEIGHT / SIZE];
+    private boolean [][] special = new boolean [WIDTH / SIZE][HEIGHT / SIZE];
 
-    //int[] shopPos = {20, 19};
-    int[] playerPos;
-    int x = 0;
-    int y = 1;
+    private final int x = 0;
+    private final int y = 1;
 
-    int encounterRate = 20;
-    int encounterCheck = encounterRate;
-    Enemy enemy;
+    private final int ENCOUNTERRATE = 25;
+    private int encounterCheck = ENCOUNTERRATE;
 
-    boolean menu = false;
+
+    private boolean menu = false;
     private int cursorState = 0;
 
-    boolean dialoguebox = false;
+    private boolean dialoguebox = false;
 
-    int animation;
+    private int animation;
 
     MapPanel()
     {        
@@ -55,7 +54,6 @@ public class MapPanel extends JPanel implements KeyListener
     public void setPlayer(Player player)
     {
         this.player = player;
-        playerPos = player.getPlayerPos();
         createLevel();
     }
     public void paintComponent(Graphics g)
@@ -63,30 +61,13 @@ public class MapPanel extends JPanel implements KeyListener
         super.paintComponent(g);
         draw(g);
     }
-    public void draw(Graphics g)
+    private void draw(Graphics g)
     {
-      /*  for(int i = 0; i < WIDTH/SIZE; i++)
-        {
-            g.drawLine(0, i*SIZE, WIDTH, i*SIZE);
-            g.setColor(Color.white);
-        } */
 
         /* Images drawn */
         g.drawImage(background.getImage(), 0, 0, null);
-        g.drawImage(playerIcon.getImage(), playerPos[0] * SIZE, playerPos[1] * SIZE, null);
+        g.drawImage(playerIcon.getImage(), player.getPlayerPos()[0] * SIZE, player.getPlayerPos()[1] * SIZE, null);
 
-        
-        /* Coords, delete this */
-       /* for(int i = 0; i < WIDTH / SIZE; i++)
-        {
-            for (int j = 0; j < HEIGHT / SIZE; j++)
-            {
-                g.setFont(new Font("Courier New", Font.BOLD, 10));
-                g.setColor(Color.white);
-                g.drawString(i + "", i * SIZE, j * SIZE - 10 + SIZE);
-                g.drawString(j + "", i * SIZE, j * SIZE + SIZE); 
-            }
-        } */
         
         /*Font set */
         g.setFont(new Font("Courier New", Font.BOLD, 20));
@@ -138,23 +119,24 @@ public class MapPanel extends JPanel implements KeyListener
         } 
         this.repaint();
     }
+    /*Called to move the player, takes in an integer to determine how the player is moved. */
     private void movePlayer(int xy, int move)
     {
-        int[] startPos = {playerPos[x], playerPos[y]}; //This temp variable takes in player's starting posistion before the move to easily move the player back if necessary
-        playerPos[xy] = playerPos[xy] + move;
-        if (playerPos[x] < 0 || playerPos[y] < 0 || playerPos[x] > WIDTH / SIZE - 1 || playerPos[y] > HEIGHT / SIZE - 1) //Keeps player in bounds
+        int[] startPos = {player.getPlayerPos()[x], player.getPlayerPos()[y]}; //This temp variable takes in player's starting posistion before the move to easily move the player back if necessary
+        player.getPlayerPos()[xy] = player.getPlayerPos()[xy] + move;
+        if (player.getPlayerPos()[x] < 0 || player.getPlayerPos()[y] < 0 || player.getPlayerPos()[x] > WIDTH / SIZE - 1 || player.getPlayerPos()[y] > HEIGHT / SIZE - 1) //Keeps player in bounds
         {
-            playerPos[x] = startPos[x];
-            playerPos[y] = startPos[y];
+            player.getPlayerPos()[x] = startPos[x];
+            player.getPlayerPos()[y] = startPos[y];
         }
-        else if (occupied[playerPos[x]][playerPos[y]] == true) //Checks if space is occupied
+        else if (occupied[player.getPlayerPos()[x]][player.getPlayerPos()[y]] == true) //Checks if space is occupied
         {
-            playerPos[x] = startPos[x];
-            playerPos[y] = startPos[y];
+            player.getPlayerPos()[x] = startPos[x];
+            player.getPlayerPos()[y] = startPos[y];
         }
-        else if (special[playerPos[x]][playerPos[y]] == true) // Checks for a special event
+        else if (special[player.getPlayerPos()[x]][player.getPlayerPos()[y]] == true) // Checks for a special event
         {
-            event(location.special(playerPos[x], playerPos[y]));
+            event(location.special(player.getPlayerPos()[x], player.getPlayerPos()[y]));
         }
         else
         {
@@ -165,12 +147,13 @@ public class MapPanel extends JPanel implements KeyListener
             }
         }
     }
-    public void encounter()
+    /*Called after a successful move, determines if a random encounter is triggered */
+    private void encounter()
     {
         Random rng = new Random();
         if (rng.nextInt(encounterCheck) + 1 == encounterCheck)
         {
-            encounterCheck = encounterRate;
+            encounterCheck = ENCOUNTERRATE;
             enemy = location.RandomEncounter();
             animate();
         }
@@ -179,7 +162,8 @@ public class MapPanel extends JPanel implements KeyListener
             encounterCheck--;
         }
     }
-    public void animate()
+    /*Called when a combat is triggered. Starts combat */
+    private void animate()
     {
         GoblinHunter2.game.removeKeyListener(this);
         Timer timer = new Timer();
@@ -201,6 +185,7 @@ public class MapPanel extends JPanel implements KeyListener
         };
         timer.scheduleAtFixedRate(task, 0, 1);
     }
+    /*Called when the enter key is pressed */
     private void enter()
     {
         switch (cursorState)
@@ -229,12 +214,14 @@ public class MapPanel extends JPanel implements KeyListener
                 break;
         }
     }
+    /*Called when the save command is used, saves the player information to a save file */
     private void save() throws IOException
     {
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("Save.txt"));
         out.writeObject(player);
         out.close();
     }
+    /*Called when the map is added, determines the map image and information based on the level from the player object */
     private void createLevel()
     {
         switch(player.getLevel())
@@ -252,12 +239,13 @@ public class MapPanel extends JPanel implements KeyListener
                 location = new Castle(WIDTH / SIZE, HEIGHT / SIZE);
                 break;
         }
-
+        dialoguebox = false;
         background.setImage(location.getImageIcon().getImage());
         occupied = location.getOccupied();
         special = location.getSpecial();
         GoblinHunter2.game.repaint();
     }
+    /*Called when stepping on to certain spots, calls an event based on the location's event number */
     private void event(int eventNumber)
     {
         switch (eventNumber)
@@ -276,8 +264,8 @@ public class MapPanel extends JPanel implements KeyListener
             case 2: //Tutorial Exit
                 player.setLevel(1);
                 player.fullheal();
-                playerPos[x] = 20;
-                playerPos[y] = 30;
+                player.getPlayerPos()[x] = 20;
+                player.getPlayerPos()[y] = 30;
                 createLevel();
                 break;
             case 3: //Bridge Goblin
@@ -290,8 +278,8 @@ public class MapPanel extends JPanel implements KeyListener
                 break;
             case 4: //Entering Cave
                 player.setLevel(2);
-                playerPos[x] = 4;
-                playerPos[y] = 34;
+                player.getPlayerPos()[x] = 4;
+                player.getPlayerPos()[y] = 34;
                 createLevel();
                 break;
             case 5: //Shop
@@ -299,8 +287,8 @@ public class MapPanel extends JPanel implements KeyListener
                 break;
             case 6: //Exiting Cave to Fields
                 player.setLevel(1);
-                playerPos[x] = 4;
-                playerPos[y] = 5;
+                player.getPlayerPos()[x] = 4;
+                player.getPlayerPos()[y] = 5;
                 createLevel();
                 break;
             case 7: //Healing Fountain
@@ -317,24 +305,29 @@ public class MapPanel extends JPanel implements KeyListener
                 break;
             case 9: //Exiting Cave to Castle
                 player.setLevel(3);
-                playerPos[x] = 19;
-                playerPos[y] = 34;
+                player.getPlayerPos()[x] = 19;
+                player.getPlayerPos()[y] = 34;
                 createLevel();
                 break;
             case 10: //Exiting Castle to Cave
                 player.setLevel(2);
-                playerPos[x] = 33;
-                playerPos[y] = 1;
+                player.getPlayerPos()[x] = 33;
+                player.getPlayerPos()[y] = 1;
                 createLevel();
                 break;
             case 11: //Goblin King
-                enemy = new GoblinKing();
-                animate();
+                if (player.getBossKills()[3] == false)
+                {
+                    enemy = new GoblinKing();
+                    animate();
+                    player.setBossKills(3);
+                    event(0);
+                }
                 break;
         }
     }
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {} //Not implemented
     @Override
     public void keyPressed(KeyEvent e) 
     {
@@ -421,5 +414,5 @@ public class MapPanel extends JPanel implements KeyListener
         this.repaint();
     }
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {} //Not implemented
 }

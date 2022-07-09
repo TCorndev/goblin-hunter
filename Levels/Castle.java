@@ -67,6 +67,8 @@ public class Castle extends Level
         if (xPos == 19 && yPos == 16)
         {
             eventnumber = goblinkingEvent;
+            this.dialogue = "You've won the game!";
+            this.dialogue2 = "Now get 100% power!";
         }
         return eventnumber;
     }
@@ -77,7 +79,6 @@ public class Castle extends Level
         Random rng = new Random();
         Enemy enemy;
         int encounter = rng.nextInt(6);
-        System.out.println(encounter);
         switch(encounter)
         {
             case 0:

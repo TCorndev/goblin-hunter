@@ -1,14 +1,11 @@
 package Enemies;
 
-import javax.swing.ImageIcon;
-
 public class GoblinArchmage extends Enemy
 {
     private boolean channeling = false;
     public GoblinArchmage()
     {
-        super("Goblin Archmage",80, 5, 7, 15, 2,false);
-        sprite = new ImageIcon("Assets/Test.png");
+        super("Goblin Archmage",160, 5, 7, 20, 300,false);
 
     }
     @Override
@@ -48,7 +45,7 @@ public class GoblinArchmage extends Enemy
         {
             case 0:
             stat = "MMP";
-            this.StatValue = 999;
+            this.StatValue = 250;
             break;
             case 1:
             stat = "MaSOL";

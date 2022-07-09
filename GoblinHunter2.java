@@ -2,25 +2,22 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.*;
 import Enemies.*;
 
 public class GoblinHunter2 
 {
     /* Basic elements */
-    static Scanner sc = new Scanner(System.in);
-    static GameFrame frame = new GameFrame();
+    private static GameFrame frame = new GameFrame();
     /* Panels */
-    static GamePanel game = new GamePanel();
-    static MenuPanel menu = new MenuPanel();
-    static StatusPanel status = new StatusPanel();
-    static MapPanel map = new MapPanel();
-    static CombatPanel combat = new CombatPanel();
-    static ShopPanel shop = new ShopPanel();
+    public static GamePanel game = new GamePanel();
+    private static MenuPanel menu = new MenuPanel();
+    private static StatusPanel status = new StatusPanel();
+    private static MapPanel map = new MapPanel();
+    private static CombatPanel combat = new CombatPanel();
+    private static ShopPanel shop = new ShopPanel();
     
-    static Player player;
+    private static Player player;
     
-    static Timer timer = new Timer();
     public static void main (String[] args)
     {
         frame.add(game); //game added to frame
@@ -28,24 +25,28 @@ public class GoblinHunter2
         frame.pack();
         frame.setLocationRelativeTo(null);
     }
+    /*Called on either the map or the menu, exits the game. */
     public static void close()
     {
         frame.dispose();
         System.exit(0);
     }
+    /*Called when the start button is pressed, creates a new player object */
     public static void start()
     {
         player = new Player(); // New player created
         startgame();
     }
+    /*Called when the load button is pressed, loads the player object from a file */
     public static void load() throws FileNotFoundException, IOException, ClassNotFoundException
     {
         ObjectInputStream load = new ObjectInputStream(new FileInputStream("Save.txt"));
-        player = (Player) load.readObject();
+        player = (Player) load.readObject(); //Load player object from file
         load.close();
         startgame();
     }
-    public static void startgame()
+    /*Called after either start or load, sets up the panels with the player information */
+    private static void startgame()
     {
         status.setPlayer(player);
         map.setPlayer(player);
@@ -57,6 +58,7 @@ public class GoblinHunter2
         game.addKeyListener(map);
         game.repaint();
     }
+    /*Called when combat starts, removes the map panel and adds the combat panel */
     public static void combat(Enemy enemy)
     {
         game.remove(map);
@@ -66,6 +68,7 @@ public class GoblinHunter2
         combat.setup(enemy);
         game.repaint();
     }
+    /*Called either when leaving the shop or combat ends, removes the panel and adds the map panel */
     public static void map()
     {
         game.remove(combat);
@@ -76,6 +79,7 @@ public class GoblinHunter2
         game.addKeyListener(map);
         game.repaint();
     }
+    /*Called when entering the shop */
     public static void shop()
     {
         game.remove(map);
@@ -83,9 +87,9 @@ public class GoblinHunter2
         game.add(shop);
         game.addKeyListener(shop);
         shop.resetShop();
-        shop.setup();
         game.repaint();
     }
+    /*Called when the player dies */
     public static void gameover()
     {
         game.remove(combat);

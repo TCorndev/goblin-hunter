@@ -1,14 +1,11 @@
 package Enemies;
 
-import javax.swing.ImageIcon;
-
 public class GoblinGuardian extends Enemy 
 {
     private boolean enrage = false;
     public GoblinGuardian() 
     {
-        super("Goblin Guardian",1000, 1, 1, 30, 3, false);
-        sprite = new ImageIcon("Assets/Test.png");
+        super("Goblin Guardian",2000, 1, 1, 35, 1000, false);
 
     }
     @Override
@@ -23,6 +20,7 @@ public class GoblinGuardian extends Enemy
         else
         {
             this.MaATK++;
+            this.MiATK++;
             this.dialogue = this.name + " grows stronger...";
             enrage = false;
         }
@@ -31,7 +29,7 @@ public class GoblinGuardian extends Enemy
     @Override
     public String statDrop() 
     {
-        this.StatValue = 999;
+        this.StatValue = 250;
         return "MHP";
     }
 }

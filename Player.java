@@ -18,7 +18,7 @@ public class Player implements Serializable
     private boolean[] bosskills = new boolean[4]; 
     private boolean[] magicunlock = new boolean[4]; //Used in the Combat panel to determine if a spell is available to cast
     private double points;
-    private final double MAXPOINTS = 2688;
+    private final double MAXPOINTS = 1190;
 
     Player() //Default constructor
     {
@@ -35,7 +35,7 @@ public class Player implements Serializable
         stats.put("HREGEN", 0);
         stats.put("MREGEN", 0);
         stats.put("Speed", 10);
-        stats.put("Gold", 10000000);
+        stats.put("Gold", 0);
 
         /*Unlocks(Items, Spells, etc.. Bought in store) */
         //Spells
@@ -45,7 +45,7 @@ public class Player implements Serializable
         items.add(new Item("Leather Armor", "This Armor will reduce the damage you take!", "(DEF + 1)", 10, false));
         items.add(new Item("Iron Sword", "Increases the damage of your sword attacks!", "(DMG Multiplier + 1)", 20, false));
         items.add(new Item("Regen Ring", "Allows you to regenerate HP!", "(HREGEN +1)", 1000, false));
-        items.add(new Item("Lifesteal Ring", "Heals you for a portion of the damage you deal!", "(Heals you for 1/4 the damage you deal)", 200000, false ));
+        items.add(new Item("Lifesteal Ring", "Heals you for a portion of the damage you deal!", "(Heals you for 1/4 the damage you deal)", 100000, false ));
 
         /* Starting Equipment Levels */
         swordLevel = 1;
@@ -110,10 +110,6 @@ public class Player implements Serializable
     {
         return hasteduration;
     }
-    public void setFireMultiplier(int firemultiplier)
-    {
-        this.firemultiplier = firemultiplier;
-    }
     public void setLevel(int level)
     {
         this.level = level;
@@ -122,10 +118,7 @@ public class Player implements Serializable
     {
         bosskills[i] = true;
     }
-    public void setGold(int cost)
-    {
-        stats.replace("Gold", stats.get("Gold") - cost);
-    }
+    /*Called when an item is bought, takes the item's name to determine what happens to the item list. */
     public void Unlock(String name)
     {
         switch(name)
@@ -229,6 +222,7 @@ public class Player implements Serializable
         stats.replace("MP", stats.get("MP") + stats.get("MREGEN"));
         statcheck();
     }
+    /* Called on when healing from the Map panel */
     public void heal()
     {
         int healcost = 3;
@@ -246,6 +240,7 @@ public class Player implements Serializable
             System.out.println("Not enough MP!");
         }
     }
+    /* Called from the Map panel during certain events */
     public void fullheal()
     {
         stats.replace("HP", stats.get("MHP"));
@@ -276,7 +271,8 @@ public class Player implements Serializable
         }
         GoblinHunter2.game.repaint();
     }
-    private void checkpoints()
+    /*Called from the status panel to determine power percentage */
+    public double getCompletionPercentage()
     {
         points = stats.get("MHP") + stats.get("MMP") + stats.get("MiATK") + stats.get("MaATK") + stats.get("MiSOL") + stats.get("MaSOL") + stats.get("Speed");
         for (int i = 0; i < items.size(); i++)
@@ -286,10 +282,6 @@ public class Player implements Serializable
                 points = points + 10;
             }
         }
-    }
-    public double getCompletionPercentage()
-    {
-        checkpoints();
         double percentage = points / MAXPOINTS * 100;
         return (percentage);
     }

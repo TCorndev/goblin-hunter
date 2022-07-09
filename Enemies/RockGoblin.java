@@ -1,7 +1,5 @@
 package Enemies;
 
-import javax.swing.ImageIcon;
-
 public class RockGoblin extends Enemy
 {
     private int attackcount = 3;
@@ -10,8 +8,7 @@ public class RockGoblin extends Enemy
     private boolean massiveAttack = false;
     public RockGoblin()
     {
-        super("Rock Goblin", 1000, 5, 7, 25, 10, true);
-        sprite = new ImageIcon("Assets/Test.png");
+        super("Rock Goblin", 1000, 5, 7, 25, 300, true);
 
     }
 

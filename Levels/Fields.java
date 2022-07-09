@@ -43,7 +43,7 @@ public class Fields extends Level
         occupied[31][31] = true;
 
         /* Shop */
-        special[20][19] = true;
+        special[14][26] = true;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class Fields extends Level
         {
             eventNumber = caveExit;
         }
-        else if (xPos == 20 && yPos == 19)
+        else if (xPos == 14 && yPos == 26)
         {
             eventNumber = shop;
             System.out.println("Attempting to shop");

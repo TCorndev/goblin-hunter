@@ -2,7 +2,6 @@ import javax.swing.JPanel;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.awt.*;
 
@@ -26,8 +25,6 @@ public class ShopPanel extends JPanel implements KeyListener
     
     /*Player variables*/
     private Player player;
-    private ArrayList<Item> playerItems;
-    private HashMap<String, Integer> stats;
     /*Item variables */
     private ArrayList<Item> Inventory = new ArrayList<>();
 
@@ -56,7 +53,7 @@ public class ShopPanel extends JPanel implements KeyListener
         g.setFont(new Font("Courier New", Font.BOLD, 20));
         g.drawString(shopSpeech2, 55, 110);
         g.drawString(cost, 55, 140);
-        g.drawString("Gold: " + stats.get("Gold"), 55, 170);
+        g.drawString("Gold: " + player.getStats().get("Gold"), 55, 170);
 
         /* Item Box */
         g.setFont(new Font("Courier New", Font.BOLD, 20));
@@ -67,7 +64,7 @@ public class ShopPanel extends JPanel implements KeyListener
         g.drawString(page + "/" + lastpage, 605, 220);
         g.drawLine(600, 220, 800, 220);
         int itemOffset = 220;
-        for (int i = (page - 1) * PAGESIZE; i < PAGESIZE * page && i < Inventory.size(); i++) //Holy crap this for loop was complicated
+        for (int i = (page - 1) * PAGESIZE; i < PAGESIZE * page && i < Inventory.size(); i++)
         {
             itemOffset = itemOffset + 20;
             g.drawString(Inventory.get(i).getName(), 605, itemOffset);
@@ -84,20 +81,18 @@ public class ShopPanel extends JPanel implements KeyListener
     public void setPlayer(Player player)
     {
         this.player = player;
-        this.playerItems = player.getItems();
-        this.stats = player.getStats();
     }
-    /* This method needs to be called every time shop is entered or item is bought*/
+    /* This method is called every time shop is entered or item is bought*/
     public void setup()
     {
-        Inventory.add(new Item("HP Restore", "Fully restore your HP", "(Cost determined based on missing HP)", stats.get("MHP") - stats.get("HP"), false));
-        Inventory.add(new Item("MP Restore", "Fully restore your MP", "(Cost determined based on missing MP)", stats.get("MMP") - stats.get("MP"), false));
+        Inventory.add(new Item("HP Restore", "Fully restore your HP", "(Cost determined based on missing HP)", player.getStats().get("MHP") - player.getStats().get("HP"), false));
+        Inventory.add(new Item("MP Restore", "Fully restore your MP", "(Cost determined based on missing MP)", player.getStats().get("MMP") - player.getStats().get("MP"), false));
         lastpage = 1;
-        for(int i = 0; i < playerItems.size(); i++)
+        for(int i = 0; i < player.getItems().size(); i++)
         {
-            if (playerItems.get(i).getUnlocked() == false)
+            if (player.getItems().get(i).getUnlocked() == false)
             {
-                Inventory.add(playerItems.get(i));
+                Inventory.add(player.getItems().get(i));
             }
         }
         int inventorySize = Inventory.size();
@@ -115,13 +110,13 @@ public class ShopPanel extends JPanel implements KeyListener
             page = lastpage;
         }
     }
+    /*Called to move the cursor */
     private void movecursor(int move)
     {
         cursorState = cursorState + move;
         if (page == lastpage)
         {
             int max = (Inventory.size() - (lastpage - 1) * PAGESIZE) - 1;
-            System.out.println(max);
             if (cursorState < 0)
             {
                 cursorState = max;
@@ -143,6 +138,7 @@ public class ShopPanel extends JPanel implements KeyListener
             }
         }
     }
+    /*Updates the dialogue with the selected item's information */
     private void itemSelected()
     {
         int i = cursorState + PAGESIZE * (page - 1);
@@ -153,24 +149,25 @@ public class ShopPanel extends JPanel implements KeyListener
             cost = "Cost: " + Inventory.get(i).getCost();
         }
     }
+    /*Called when an item is bought */
     private void buyItem()
     {
         int i = cursorState + PAGESIZE * (page - 1);
-        if (Inventory.get(i).getCost() <= stats.get("Gold")) 
+        if (Inventory.get(i).getCost() <= player.getStats().get("Gold")) 
         {
             if (i == 0) //HP Restore
             {
-                stats.replace("Gold", stats.get("Gold") - Inventory.get(i).getCost());
-                stats.replace("HP", stats.get("MHP"));
+                player.getStats().replace("Gold", player.getStats().get("Gold") - Inventory.get(i).getCost());
+                player.getStats().replace("HP", player.getStats().get("MHP"));
             }
             if (i == 1) //MP Restore
             {
-                stats.replace("Gold", stats.get("Gold") - Inventory.get(i).getCost());
-                stats.replace("MP", stats.get("MMP"));
+                player.getStats().replace("Gold", player.getStats().get("Gold") - Inventory.get(i).getCost());
+                player.getStats().replace("MP", player.getStats().get("MMP"));
             }
             if (i > 1)
             {
-                stats.replace("Gold", stats.get("Gold") - Inventory.get(i).getCost());
+                player.getStats().replace("Gold", player.getStats().get("Gold") - Inventory.get(i).getCost());
                 Inventory.get(i).setUnlocked(true);
                 player.Unlock(Inventory.get(i).getName());
             }
@@ -179,6 +176,7 @@ public class ShopPanel extends JPanel implements KeyListener
         }
         GoblinHunter2.game.repaint();
     }
+    /*Called when leaving the shop, updates the dialogue based on player's progress */
     private void hintdialogue()
     {
         int progress = 0;
@@ -187,7 +185,6 @@ public class ShopPanel extends JPanel implements KeyListener
             if (player.getBossKills()[i] == false)
             {
                 progress = i;
-                System.out.println(i);
                 break;
             }
         }
@@ -205,10 +202,14 @@ public class ShopPanel extends JPanel implements KeyListener
                 shopSpeech1 = "The castle sits atop a volcano";
                 shopSpeech2 = "Are you powerful enough to dethrone the Goblin King?";
                 break;
+            case 4: //Goblin King defeated
+                shopSpeech1 = "Wow, you did it!";
+                shopSpeech2 = "Feel free to purchase any remaining wares!";
             default:
                 break;
         }
     }
+    /*Called when entering the shop, resets variables */
     public void resetShop()
     {
         shopSpeech1 = "Welcome to my shop. Please take a look around.";
@@ -218,13 +219,11 @@ public class ShopPanel extends JPanel implements KeyListener
         exitShop = false;
         page = 1;
         cursorState = 0;
-        Inventory.clear(); 
+        Inventory.clear();
+        setup();
     }
     @Override
-    public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void keyTyped(KeyEvent e) {} //Not implemented
 
     @Override
     public void keyPressed(KeyEvent e) 
@@ -287,9 +286,6 @@ public class ShopPanel extends JPanel implements KeyListener
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
+    public void keyReleased(KeyEvent e) {} //Not implemented
     
 }

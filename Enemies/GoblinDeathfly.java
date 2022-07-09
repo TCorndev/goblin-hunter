@@ -1,13 +1,11 @@
 package Enemies;
 
-import javax.swing.ImageIcon;
 
 public class GoblinDeathfly extends Enemy 
 {
     public GoblinDeathfly() 
     {
-        super("Goblin Deathfly",40, 4, 4, 100, 3, false);
-        sprite = new ImageIcon("Assets/Test.png");
+        super("Goblin Deathfly",40, 4, 6, 100, 200, false);
 
     }
     @Override

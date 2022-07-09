@@ -1,15 +1,11 @@
 package Enemies;
 
-import javax.swing.ImageIcon;
-
 public class BridgeGoblin extends Enemy
 {
     boolean enrage = false;
     public BridgeGoblin()
     {
         super("Bridge Goblin", 100, 2, 5, 10, 10, true);
-        sprite = new ImageIcon("Assets/Test.png");
-
     }
 
     @Override

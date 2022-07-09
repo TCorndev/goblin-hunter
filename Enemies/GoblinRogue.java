@@ -1,7 +1,5 @@
 package Enemies;
 
-import javax.swing.ImageIcon;
-
 public class GoblinRogue extends Enemy 
 {
     private int attackcount = 3;
@@ -9,8 +7,7 @@ public class GoblinRogue extends Enemy
     private boolean flurry = false;
     public GoblinRogue() 
     {
-        super("Goblin Rogue",50, 2, 4, 25, 3, false);
-        sprite = new ImageIcon("Assets/Test.png");
+        super("Goblin Rogue",50, 2, 4, 25, 100, false);
 
     }
     @Override

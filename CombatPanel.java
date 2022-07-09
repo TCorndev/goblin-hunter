@@ -31,17 +31,16 @@ public class CombatPanel extends JPanel implements KeyListener
     private boolean endCombat = false;
     private boolean gameover = false;
     /* Spell costs */
-    private int healcost = 3;
-    private int firecost = 10;
-    private int shieldcost = 5;
-    private int hastecost = 20;
+    private final int HEALCOST = 3;
+    private final int FIRECOST = 10;
+    private final int SHIELDCOST = 5;
+    private final int HASTECOST = 20;
 
     /* Animation variables */
     private int animationnumber;
     private HashMap<String, Boolean> animations = new HashMap<>();
 
     private String dialogue[] = new String[4];
-    //private Boolean enemyTurn = false; //NYI
     private boolean magic = false;
     
     private int playerActionThreshold = THRESHOLD;
@@ -49,7 +48,6 @@ public class CombatPanel extends JPanel implements KeyListener
     
     /* Player Information */
     private Player player;
-    private HashMap<String, Integer> stats;
     
     CombatPanel()
     {
@@ -213,9 +211,8 @@ public class CombatPanel extends JPanel implements KeyListener
     public void setPlayer(Player player)
     {
         this.player = player;
-        this.stats = player.getStats();
-        this.gameover = false;
     }
+    /* Called at the start of combat, resets variables and sets the enemy. */
     public void setup(Enemy enemy)
     {
         this.enemy = enemy;
@@ -227,9 +224,11 @@ public class CombatPanel extends JPanel implements KeyListener
         this.playerActionThreshold = THRESHOLD;
         this.enemyActionThreshold = THRESHOLD;
         this.endCombat = false;
+        this.gameover = false;
         startCombat();
     }
-    public void startCombat()
+    /* Called after every turn in combat, determines who goes next and resets some relevant variables. */
+    private void startCombat()
     {
         cursorState = 0;
         player.statcheck();
@@ -247,8 +246,8 @@ public class CombatPanel extends JPanel implements KeyListener
                 @Override
                 public void run() 
                 {
-                    playerActionThreshold = playerActionThreshold - stats.get("Speed") - hastevalue;
-                    if (playerActionThreshold <= 0)
+                    playerActionThreshold = playerActionThreshold - player.getStats().get("Speed") - hastevalue;
+                    if (playerActionThreshold <= 0) //Player turn
                     {
                         playerTurn = true;
                         player.regen();
@@ -258,25 +257,24 @@ public class CombatPanel extends JPanel implements KeyListener
                         timer.cancel();
                         GoblinHunter2.game.repaint();
                     }
-                    enemyActionThreshold = enemyActionThreshold - enemy.getSpeed();
+                    enemyActionThreshold = enemyActionThreshold - enemy.getSpeed(); //Enemy turn
                     if (enemyActionThreshold <= 0)
                     {
                         enemyActionThreshold = enemyActionThreshold + THRESHOLD;
                         enemyAttack(timer);
-                        //timer.cancel();
-                        GoblinHunter2.game.repaint(); //Normally animations will cover this repaint
+                        GoblinHunter2.game.repaint();
                     }
                 }
             };
             timer.scheduleAtFixedRate(task, 0, 1);
         }
     }
-    public void checkhaste()
+    /* Checks if character is hasted, reducing the haste duration as needed. */
+    private void checkhaste()
     {
         if (hasteduration > 0)
         {
             hasteduration--;
-            System.out.println("ops");
         }
         else if (hastevalue > 0)
         {
@@ -284,10 +282,11 @@ public class CombatPanel extends JPanel implements KeyListener
             updateDialogue("You haste spell has worn off...");
         }
     }
+    /* Determines the nature of the enemy's attack */
     private void enemyAttack(Timer timer)
     {
         int shieldValue = 1;
-        if (defend == true)
+        if (defend == true) //Adds shield multiplier to defense when defending.
         {
             shieldValue = shieldValue + player.getShieldLevel();
         }
@@ -298,7 +297,7 @@ public class CombatPanel extends JPanel implements KeyListener
         }
         else
         {
-            damage = damage - stats.get("DEF") * shieldValue; //Reduce damage by player's defence value, multiple by shield value(if blocking)
+            damage = damage - player.getStats().get("DEF") * shieldValue; //Reduce damage by player's defense value, multiple by shield value(if blocking)
             if (damage < 0)
             {
                 damage = 0;
@@ -318,66 +317,78 @@ public class CombatPanel extends JPanel implements KeyListener
                 shieldactive = false;
             }
         }
-        stats.replace("HP", stats.get("HP") - damage);
-        if (stats.get("HP") <= 0)
+        player.getStats().replace("HP", player.getStats().get("HP") - damage);
+        player.statcheck(); 
+        if (player.getStats().get("HP") <= 0)
         {
-            stats.replace("HP", 0);
+            player.getStats().replace("HP", 0);
             updateDialogue("You fall before " + enemy.getName() + "...");
             gameover = true;
             playerTurn = false;
             timer.cancel();
         }
     }
+    /*Called when the attack command is used */
     private void attack()
     {
         playerTurn = false;
-        int damage = (rng.nextInt(stats.get("MaATK") - stats.get("MiATK") + 1) + stats.get("MiATK")) * player.getSwordLevel();
+        int length = 5;
+        int damage = (rng.nextInt(player.getStats().get("MaATK") - player.getStats().get("MiATK") + 1) + player.getStats().get("MiATK")) * player.getSwordLevel();
         enemy.setHP(enemy.getHP() - damage);
-        animation("Attack", 5);
+        animation("Attack", length);
         updateDialogue("You attack for " + damage + " damage!");
         if (player.getBloodthirst() == true)
         {
             int heal = (int)(damage / 4);
             updateDialogue("And heal for " + heal + " HP!");
-            stats.replace("HP", stats.get("HP") + heal);
+            player.getStats().replace("HP", player.getStats().get("HP") + heal);
             player.statcheck();
         }
     }
+    /*Called when the heal spell is used */
     private void heal()
     {
+        playerTurn = false;
         int length = 5;
-        int heal = rng.nextInt(stats.get("MaSOL") - stats.get("MiSOL") + 1) + stats.get("MiSOL");
-        stats.replace("HP", stats.get("HP") + heal);
-        stats.replace("MP", stats.get("MP") - healcost);
+        int heal = rng.nextInt(player.getStats().get("MaSOL") - player.getStats().get("MiSOL") + 1) + player.getStats().get("MiSOL");
+        player.getStats().replace("HP", player.getStats().get("HP") + heal);
+        player.getStats().replace("MP", player.getStats().get("MP") - HEALCOST);
         animation("Heal", length);
         updateDialogue("You restore " + heal + " HP!");
         player.statcheck();
     }
+    /*Called when the fire spell is used */
     private void fire()
     {
+        playerTurn = false;
         int length = 5;
-        int damage = (rng.nextInt(stats.get("MaSOL") - stats.get("MiSOL") + 1) + stats.get("MiSOL")) * player.getFireMultiplier();
-        stats.replace("MP", stats.get("MP") - firecost);
+        int damage = (rng.nextInt(player.getStats().get("MaSOL") - player.getStats().get("MiSOL") + 1) + player.getStats().get("MiSOL")) * player.getFireMultiplier();
+        player.getStats().replace("MP", player.getStats().get("MP") - FIRECOST);
         enemy.setHP(enemy.getHP() - damage);
         animation("Fire", length);
         updateDialogue("You ignite " + enemy.getName() + " for " + damage + " damage!");
     }
+    /*Called when the shield spell is used */
     private void shield()
     {
+        playerTurn = false;
         shieldactive = true;
         updateDialogue("You surrounded yourself with a magic shield!");
-        stats.replace("MP", stats.get("MP") - shieldcost);
+        player.getStats().replace("MP", player.getStats().get("MP") - SHIELDCOST);
         startCombat();
     }
+    /*Called when the haste spell is used */
     private void haste()
     {
+        playerTurn = false;
         int length = 8;
-        hastevalue = rng.nextInt(stats.get("MaSOL") - stats.get("MiSOL") + 1) + stats.get("MiSOL");
-        stats.replace("MP", stats.get("MP") - hastecost);
+        hastevalue = rng.nextInt(player.getStats().get("MaSOL") - player.getStats().get("MiSOL") + 1) + player.getStats().get("MiSOL");
+        player.getStats().replace("MP", player.getStats().get("MP") - HASTECOST);
         animation("Haste", length);
         hasteduration = player.getHasteDuration();
         updateDialogue("Speed increased by " + hastevalue + " for " + hasteduration + " rounds!");
     }
+    /*Determines the combat animation based on the attack used(String), makes use of the animation hashmap */
     private void animation(String animation, int length)
     {
         animations.replace(animation, true);
@@ -403,9 +414,10 @@ public class CombatPanel extends JPanel implements KeyListener
         };
         timer.scheduleAtFixedRate(task, 0, 100);
     }
+    /*Called when the flee command is used */
     private void flee()
     {
-        if (stats.get("Speed") > enemy.getSpeed())
+        if (player.getStats().get("Speed") > enemy.getSpeed())
         {
             GoblinHunter2.map();
         }
@@ -415,6 +427,7 @@ public class CombatPanel extends JPanel implements KeyListener
             startCombat();
         }
     }
+    /*Called when the enter key is pressed, determines what happens based on cursorstate */
     private void enter()
     {
         if (magic == false)
@@ -452,80 +465,81 @@ public class CombatPanel extends JPanel implements KeyListener
                 case 0: //Heal
                     if (player.getMagicUnlock()[0] == true)
                     {
-                        if (stats.get("MP") >= healcost)
+                        if (player.getStats().get("MP") >= HEALCOST)
                         {
                             heal();
                         }
                         else
                         {
-                            updateDialogue("Not enough MP! (Cost: " + healcost + " MP)");
+                            updateDialogue("Not enough MP! (Cost: " + HEALCOST + " MP)");
                         }
                     }
                     break;
                 case 1: //Fire
                     if (player.getMagicUnlock()[1] == true)
                     {
-                        if (stats.get("MP") >= firecost)
+                        if (player.getStats().get("MP") >= FIRECOST)
                         {
                             fire();
                         }
                         else
                         {
-                            updateDialogue("Not enough MP! (Cost: " + firecost + " MP)");
+                            updateDialogue("Not enough MP! (Cost: " + FIRECOST + " MP)");
                         }
                     }
                     break;
                 case 2: //Shield
                     if (player.getMagicUnlock()[2] == true)
                     {
-                        if (stats.get("MP") >= shieldcost)
+                        if (player.getStats().get("MP") >= SHIELDCOST)
                         {
                             shield();
                         }
                         else
                         {
-                            updateDialogue("Not enough MP! (Cost: " + shieldcost + " MP)");;
+                            updateDialogue("Not enough MP! (Cost: " + SHIELDCOST + " MP)");;
                         }
                     }
                     break;
                 case 3: //Haste
                     if (player.getMagicUnlock()[3] == true)
                     {
-                        if (stats.get("MP") >= hastecost)
+                        if (player.getStats().get("MP") >= HASTECOST)
                         {
                             haste();
                         }
                         else
                         {
-                            updateDialogue("Not enough MP! (Cost: " + hastecost + " MP)");;
+                            updateDialogue("Not enough MP! (Cost: " + HASTECOST + " MP)");;
                         }
                     }
                     break;
             }     
         }
     }
+    /*Called when the enemy is defeated, handles stat increases and gold */
     private void enemydefeated()
     {
         String statdrop = enemy.statDrop();
         boolean statup = false;
-        if (stats.get(statdrop) < enemy.getStatValue())
+        if (player.getStats().get(statdrop) < enemy.getStatValue()) //Check if player can learn anything from the enemy
         {
             statup = true;
             if (player.getLevel() == 0)
             {
-                stats.replace(statdrop, stats.get(statdrop) + 1);
+                player.getStats().replace(statdrop, player.getStats().get(statdrop) + 1);
             }
             else
             {
-                stats.replace(statdrop, stats.get(statdrop) + player.getLevel());
-                if(stats.get(statdrop) > enemy.getStatValue())
+                player.getStats().replace(statdrop, player.getStats().get(statdrop) + player.getLevel());
+                if(player.getStats().get(statdrop) > enemy.getStatValue())
                 {
-                    stats.replace(statdrop, enemy.getStatValue());
+                    player.getStats().replace(statdrop, enemy.getStatValue());
                 }
             }
         }
         player.statcheck();
-        stats.replace("Gold", stats.get("Gold") + enemy.getGold());
+        player.getStats().replace("Gold", player.getStats().get("Gold") + enemy.getGold());
         animationnumber = 0;
         updateDialogue(enemy.getName() + " perishes!");
         updateDialogue("You get " + enemy.getGold() + " gold!");
@@ -539,6 +553,7 @@ public class CombatPanel extends JPanel implements KeyListener
         }
         endCombat = true;
     }
+    /*Called whenever dialogue is updated, adds it to the String array that's drawn in the dialogue box */
     private void updateDialogue(String string)
     {
         for (int i = dialogue.length - 1; i > 0; i--)
@@ -547,6 +562,7 @@ public class CombatPanel extends JPanel implements KeyListener
         }
         dialogue[0] = string;
     }
+    /*Clears the dialogue string array, called at the start of a new battle */
     private void clearDialogue()
     {
         for (int i = 0; i < dialogue.length; i++)
@@ -556,10 +572,7 @@ public class CombatPanel extends JPanel implements KeyListener
     }
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
-		
-	}
+	public void keyTyped(KeyEvent e) {} //Not implemented
 	@Override
 	public void keyPressed(KeyEvent e) 
     {
@@ -609,8 +622,5 @@ public class CombatPanel extends JPanel implements KeyListener
         this.repaint();
 	}
 	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyReleased(KeyEvent e) {} //Not implemented
 }

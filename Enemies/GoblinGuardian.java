@@ -5,7 +5,7 @@ public class GoblinGuardian extends Enemy
     private boolean enrage = false;
     public GoblinGuardian() 
     {
-        super("Goblin Guardian",2000, 1, 1, 35, 1000, false);
+        super("Goblin Guardian",2000, 1, 1, 35, 1500, false);
 
     }
     @Override

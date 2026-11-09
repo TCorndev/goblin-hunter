@@ -85,8 +85,8 @@ public class ShopPanel extends JPanel implements KeyListener
     /* This method is called every time shop is entered or item is bought*/
     public void setup()
     {
-        Inventory.add(new Item("HP Restore", "Fully restore your HP", "(Cost determined based on missing HP)", player.getStats().get("MHP") - player.getStats().get("HP"), false));
-        Inventory.add(new Item("MP Restore", "Fully restore your MP", "(Cost determined based on missing MP)", player.getStats().get("MMP") - player.getStats().get("MP"), false));
+        Inventory.add(new Item("HP Restore", "Fully restore your HP", "(Cost determined based on missing HP)", player.getStats().get("MHP") - player.getStats().get("HP"), false)); //Cost is equal to missing HP
+        Inventory.add(new Item("MP Restore", "Fully restore your MP", "(Cost determined based on missing MP)", (int)((player.getStats().get("MMP") - player.getStats().get("MP")) / 2), false)); //Cost is equal to missing MP / 2
         lastpage = 1;
         for(int i = 0; i < player.getItems().size(); i++)
         {

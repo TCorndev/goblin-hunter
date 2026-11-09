@@ -1,4 +1,5 @@
 import javax.swing.JPanel;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.*;
@@ -10,6 +11,7 @@ public class MenuPanel extends JPanel implements ActionListener
     private JButton ExitButton = new JButton();
     private JButton LoadButton = new JButton();
     private ImageIcon title = new ImageIcon("Assets/Title.png");
+    private boolean loadInformation = false;
     
     MenuPanel()
     {
@@ -39,6 +41,12 @@ public class MenuPanel extends JPanel implements ActionListener
     public void draw(Graphics g)
     {
         g.drawImage(title.getImage(), 250, 300, null);
+        if (this.loadInformation == true)
+        {
+            g.setFont(new Font("Courier New", Font.BOLD, 20));
+            g.setColor(Color.white);
+            g.drawString("No save data available", 560, 820);
+        }
     }
     /*Called when a button is pushed */
     public void actionPerformed(ActionEvent event)
@@ -46,20 +54,27 @@ public class MenuPanel extends JPanel implements ActionListener
         if (event.getSource() == StartButton) 
         {
             GoblinHunter2.start();
+            this.loadInformation = false;
         }
         if (event.getSource() == LoadButton)
         {
             try 
             {
                 GoblinHunter2.load();
-            } catch (Exception e) 
+            } 
+            catch (Exception e) //If exception is caught, then user is informed.
             {
-                System.out.println(e);
+                this.loadInformation = true;
+                this.repaint();
             }
         }
         if (event.getSource() == ExitButton)
         {
             GoblinHunter2.close();
         }
+    }
+    public void setLoadInformation()
+    {
+        this.loadInformation = true;
     }
 }

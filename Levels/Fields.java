@@ -61,7 +61,6 @@ public class Fields extends Level
         else if (xPos == 14 && yPos == 26)
         {
             eventNumber = shop;
-            System.out.println("Attempting to shop");
         }
         return eventNumber;
     }

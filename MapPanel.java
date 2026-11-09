@@ -40,6 +40,7 @@ public class MapPanel extends JPanel implements KeyListener
     private int cursorState = 0;
 
     private boolean dialoguebox = false;
+    private boolean savebox = false;
 
     private int animation;
 
@@ -108,6 +109,14 @@ public class MapPanel extends JPanel implements KeyListener
             g.drawRect(200, 200, 600, 60);
             g.drawString(location.getDialogue(), 205, 220);
             g.drawString(location.getDialogue2(), 205, 240);
+        }
+        if (savebox == true)
+        {
+            g.setColor(Color.black);
+            g.fillRect(200, 200, 600, 60);
+            g.setColor(Color.white);
+            g.drawRect(200, 200, 600, 60);
+            g.drawString("Game saved!", 205, 220);
         }
 
         /* Combat starting animation */
@@ -197,6 +206,9 @@ public class MapPanel extends JPanel implements KeyListener
                 try 
                 {
                     save();
+                    menu = false;
+                    savebox = true;
+                    cursorState = 0;
                 } 
                 catch (Exception e) 
                 {
@@ -370,7 +382,7 @@ public class MapPanel extends JPanel implements KeyListener
                     break;
             }
         }
-        else if (dialoguebox == true) // Dialoguebox
+        else if (dialoguebox == true || savebox == true) // Dialoguebox
         {
             switch(e.getKeyCode())
             {
@@ -378,6 +390,7 @@ public class MapPanel extends JPanel implements KeyListener
                 case 10:
                 case 27:
                     dialoguebox = false;
+                    savebox = false;
                     break;
             }
         }

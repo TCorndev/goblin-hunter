@@ -2,6 +2,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+
 import Enemies.*;
 
 public class GoblinHunter2 
@@ -43,7 +44,8 @@ public class GoblinHunter2
         ObjectInputStream load = new ObjectInputStream(new FileInputStream("Save.txt"));
         player = (Player) load.readObject(); //Load player object from file
         load.close();
-        startgame();
+        startgame();            
+        
     }
     /*Called after either start or load, sets up the panels with the player information */
     private static void startgame()

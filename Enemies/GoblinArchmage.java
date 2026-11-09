@@ -5,7 +5,7 @@ public class GoblinArchmage extends Enemy
     private boolean channeling = false;
     public GoblinArchmage()
     {
-        super("Goblin Archmage",160, 5, 7, 20, 300,false);
+        super("Goblin Archmage",160, 5, 7, 20, 450,false);
 
     }
     @Override

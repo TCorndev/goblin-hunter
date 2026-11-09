@@ -28,7 +28,7 @@ public class Player implements Serializable
         stats.put("MP", 10);
         stats.put("MMP", 10);
         stats.put("MiATK", 1);
-        stats.put("MaATK", 3);
+        stats.put("MaATK", 5);
         stats.put("MiSOL", 1);
         stats.put("MaSOL", 3);
         stats.put("DEF", 0);
@@ -232,12 +232,7 @@ public class Player implements Serializable
             int heal = rng.nextInt(stats.get("MaSOL") - stats.get("MiSOL") + 1) + stats.get("MiSOL");
             stats.replace("HP", stats.get("HP") + heal);
             stats.replace("MP", stats.get("MP") - healcost);
-            System.out.println("Heal for: " + heal);
             statcheck();
-        }
-        else
-        {
-            System.out.println("Not enough MP!");
         }
     }
     /* Called from the Map panel during certain events */

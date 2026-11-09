@@ -5,7 +5,7 @@ public class GoblinArcher extends Enemy
 {
     public GoblinArcher() 
     {
-        super("Goblin Archer",180, 12, 13, 45, 500, false);
+        super("Goblin Archer",180, 12, 13, 45, 750, false);
     }
     @Override
     public int Action()

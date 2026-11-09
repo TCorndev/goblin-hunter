@@ -5,7 +5,7 @@ public class GoblinKnight extends Enemy
 {
     public GoblinKnight() 
     {
-        super("Goblin Knight",200, 10, 17, 25, 500, false);
+        super("Goblin Knight",200, 10, 17, 25, 750, false);
 
     }
     @Override
